@@ -150,28 +150,137 @@ f2
 
 ggsave(filename=paste0("05Plots/Fig2.jpeg"), f2, dpi = 300) ## plot used in the paper
 
-### Sup S1
-nf2 <-length(list.files('03processedData/constrain/2_na_permutations/simulatedData/results/', full.names = TRUE))
+### Fig 3
+lpi_resultNAZero <- read.csv('04FinalData/constrain/1_na_zero_permutations/without_permutation/without_permutationNAand0.csv')
 
-resultsPermuNA <- lapply(1:nf2, function(i) {
-  filepath <- sprintf("03processedData/constrain/2_na_permutations/simulatedData/results/permutation_result_%03d.rds", i)
+Fig3 <- ggplot(data = lpi_resultNAZero, aes(x = numZeros, y = LPI_final, label = years)) +
+  geom_hline(yintercept = 1,  color = "orange", size = 1) +#ff7300
+  coord_cartesian(ylim = c(0.2, 1.2), xlim = c(0, 3500)) +
+  geom_point(aes( fill = years), alpha = 0.7, size = 5, colour="black",pch=21) +
+
+scale_fill_viridis_c(option = "D",
+       guide = guide_colorbar(nbin = 8, raster = FALSE, barheight = unit(5, "cm"), ticks = FALSE, show.limits = FALSE),
+       breaks = c(1950, 1960, 1980, 2000, 2020), 
+       limits = c(1950, 2020)) +
+
+  
+  labs(x = "Number of Zeros",
+       y = "LPI", fill = "Years\n") +
+  theme_minimal() +
+    theme(
+      panel.border = element_rect(
+      color = "black",      
+      fill = NA,            
+      linewidth = 2    
+    ),
+    text = element_text(size = 20, family = "bold"),
+    plot.title = element_text(size = 14, face = "bold")
+  )
+
+Fig3
+
+ggsave(filename=paste0("05Plots/Fig3.png"), Fig3, dpi = 300) ## plot used in the paper
+
+
+##### Supp Mat
+## SuppMat 1a
+lpi_resultR <- read.csv('04FinalData/complete/real/Complete_dataSet/Complete_dataSet.csv')
+
+SuppMat1a <- ggplot(lpi_resultR, aes(x = years)) +
+  coord_cartesian(ylim = c(0, 1.3)) +
+  geom_ribbon(aes(ymin = CI_low, ymax = CI_high), alpha = 0.3, fill = "#ff7f0e") +
+  geom_line(aes(y = LPI_final), color = "#ff7f0e", size = 1.5) +
+  geom_line(aes(y = numZeros/max(numZeros)*1.2), color = "#9467bd", size = 1.5) +
+    geom_hline(yintercept = 1,  color = "#000000a8", size = 1) +#ff7300
+
+  scale_y_continuous(
+    name = "LPI values",
+    sec.axis = sec_axis(~ . * max(lpi_resultNAZero$numZeros)/1.2, name = "Number of Zeros")
+  ) +
+  labs(x = "Years") +
+  theme_minimal() +
+  theme(
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 2),
+    text = element_text(size = 20, family = "bold"),
+    plot.title = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#ff7f0e"),
+    axis.title.y.right = element_text(color = "#9467bd")
+  )
+
+ggsave(filename=paste0("05Plots/SuppMat1a.jpeg"), SuppMat1a, dpi = 300) ## plot used in the paper
+
+## SuppMat 1b
+## Zeros on the permutations
+# simulated data used to creates the matrices
+npd <-length(list.files('03processedData/constrain/3_zero_permutations/simulatedData/processing/',  pattern = 'matrix', full.names = TRUE))
+
+matricesPermu0 <- lapply(1:npd, function(i) {
+  filepath <- sprintf("03processedData/constrain/3_zero_permutations/simulatedData/processing/matrix_%03d.rds", i)
   if (file.exists(filepath)) {
     readRDS(filepath)
   } else {
-    NULL 
+    NULL  
   }
+}) 
+# Create a matrix with the matrices used to obtain the LPI
+matricesPermu0_up <- lapply(matricesPermu0, function(df) {
+  df[ , !(names(df) %in% c('Binomial', 'ID'))]
 })
 
-# Convert each data frame in the list to a data.table and add years column
-for (i in seq_along(resultsPermuNA)) {
-  setDT(resultsPermuNA[[i]])  # convert in-place, no warning if already data.table
-  resultsPermuNA[[i]][, years := c(years,2021)]
+## Check the number of zeros on the results
+head(matricesPermu0[[1]],3)
+
+# Adding zeros per permutation inthemaatriz of the results
+for (i in seq_along(resultsPermu0)) {
+  # Check if the data frame exists and is not NULL
+  if (!is.null(resultsPermu0[[i]]) && nrow(resultsPermu0[[i]]) > 0) {
+    # Check if corresponding matrix exists in the other list
+    if (i <= length(matricesPermu0_up) && !is.null(matricesPermu0_up[[i]])) {
+      df_matrix <- matricesPermu0_up[[i]] ## upload the original dataset
+      setDT(resultsPermu0[[i]]) # upload the seults
+      resultsPermu0[[i]] <- resultsPermu0[[i]][c(1:nrow(resultsPermu0[[i]]) -1), ]
+      ## Ad columns
+      resultsPermu0[[i]][, years := c(years)] # years
+      numZeros <- colSums(df_matrix == 0, na.rm = TRUE) 
+      resultsPermu0[[i]] [, numZeros := numZeros] # number of zeros
+    }
+  }
 }
 
-head(resultsPermuNA[[1]],3)
+head(resultsPermu0[[2]],3)
+# Keep only non-NULL data frames
+valid_indices <- which(!sapply(resultsPermu0, is.null) & sapply(resultsPermu0, is.data.frame))
 
-# Plotting Fig Na and zero with empirical data
-s1 <- purrr::map_df(seq_along(resultsPermuNA), ~ mutate(resultsPermuNA[[.x]], sim = .x, label = "Permutations using \n empirical-data NAs"))
-s1 <- lpi_multiplot(s1, colr = colr); s1
+fnumzero <- map_df(valid_indices, ~ {
+  mutate(resultsPermu0[[.x]], sim = .x, label = "Permutations")
+})
 
-ggsave(filename=paste0("05Plots/S1.jpeg"), s1, dpi = 300) 
+SuppMat1b <- ggplot()+
+  coord_cartesian(ylim = c(0, 1.3)) +
+
+  geom_point(data = fnumzero, aes(x = numZeros, y = LPI_final), 
+             color = "#1f77b4", alpha = 1, size = 1) +
+
+  geom_point(data = lpi_resultNAZero, aes(y = LPI_final, x = numZeros), 
+            fill = "#ff7f0e",  size = 3,  colour="black",pch=21) +
+  geom_hline(yintercept = 1,  color = "#000000a8", size = 1) +#ff7300
+  labs(x = "Number of zeros", y = "LPI values") +
+  theme_minimal() +
+  theme(
+        panel.border = element_rect(
+      color = "#000000",      
+      fill = NA,            
+      linewidth = 2,      
+    ),
+    text = element_text(size = 20, family = "bold"),
+    plot.title = element_text(size = 14, face = "bold")
+  )
+SuppMat1b
+
+
+ggsave(filename=paste0("05Plots/SuppMat1b.jpeg"), SuppMat1b, dpi = 300) 
+
+Suppmat1b <- SuppMat1a + SuppMat1b  &
+  plot_annotation(tag_levels = "A") 
+
+ggsave(filename=paste0("05Plots/Other/SuppMat1b.jpeg"),Suppmat1b, dpi = 300) 

@@ -79,7 +79,10 @@ lpi_resultNAZero <- LPIMain(
   title = 'LPI Results Simulated Data - NA real dataaset', REF_YEAR = 1950, PLOT_MAX = 2019, BOOT_STRAP_SIZE = 1000, VERBOSE = FALSE
 )
 
-lpi_resultNAZero$years <- years
+lpi_resultNAZero$years <- years # Add the year
+TotofZeros <- colSums(lpi_data_filtered == 0, na.rm = T) # Count the number of zeros per year
+lpi_resultNAZero$numZeros <- TotofZeros # Add, per year, the number of zeros 
+
 write.csv(lpi_resultNAZero, '04FinalData/constrain/1_na_zero_permutations/without_permutation/without_permutationNAand0.csv')
 #lpi_resultNAZero <- read.csv('04FinalData/constrain/without/without_permutationNAand0.csv')
 
