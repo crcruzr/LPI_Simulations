@@ -121,7 +121,7 @@ lpi_data_filtered <- lpi_data %>% select(matches("^X[0-9]"))
 lpi_data_filtered <- clean_data(lpi_data_filtered)
 TotofZeros <- colSums(lpi_data_filtered == 0, na.rm = T)
 lpi_resultR <- lpi_resultR[-nrow(lpi_resultR),]
-lpi_resultR$numZeros <- c(TotofZeros-length(TotofZeros))
+lpi_resultR$numZeros <- TotofZeros
 
 dir.create("04FinalData/complete/real/Complete_dataSet",
            recursive = TRUE,

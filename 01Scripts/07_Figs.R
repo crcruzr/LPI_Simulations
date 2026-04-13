@@ -152,20 +152,39 @@ ggsave(filename=paste0("05Plots/Fig2.jpeg"), f2, dpi = 300) ## plot used in the 
 
 ### Fig 3
 lpi_resultNAZero <- read.csv('04FinalData/constrain/1_na_zero_permutations/without_permutation/without_permutationNAand0.csv')
+lpi_resultR <- read.csv('04FinalData/complete/real/Complete_dataSet/Complete_dataSet.csv')
 
-Fig3 <- ggplot(data = lpi_resultNAZero, aes(x = numZeros, y = LPI_final, label = years)) +
+filter_labels <- function(df) {
+  df %>% 
+    filter(
+      (years >= 1950 & years < 1980 & years %% 5 == 0) | 
+      (years >= 1980 & years < 2000 & years %% 10 == 0) | 
+      (years >= 2000 & years <= 2020)
+    )
+}
+lpi_labels <- lpi_resultR %>%
+  filter(years %in% c(1955, 1974, 1991, 1997, 2009, 2010, 2013, 2017, 2020))
+
+
+
+Fig3 <-
+ ggplot(data = lpi_resultR, aes(x = numZeros, y = LPI_final, label = years, shape = "Simulations")) +
   geom_hline(yintercept = 1,  color = "orange", size = 1) +#ff7300
-  coord_cartesian(ylim = c(0.2, 1.2), xlim = c(0, 3500)) +
-  geom_point(aes( fill = years), alpha = 0.7, size = 5, colour="black",pch=21) +
+  coord_cartesian( xlim = c(0, 3700)) +
+  geom_point(aes( fill = years), alpha = 0.7, size = 7, colour="black",pch=21) +
+  geom_segment(data = lpi_labels, aes(x = numZeros + 50, y = LPI_final, xend = numZeros + 190, yend = LPI_final), color = "black") +
+  geom_text(data = lpi_labels, aes(x = numZeros + 210, y = LPI_final, label = years), hjust = 0, size = 5) +
+
+ # geom_point(data = lpi_resultR, aes( fill = years, shape = "LPD"), alpha = 0.7, size = 5, colour="black",pch=22) +
 
 scale_fill_viridis_c(option = "D",
        guide = guide_colorbar(nbin = 8, raster = FALSE, barheight = unit(5, "cm"), ticks = FALSE, show.limits = FALSE),
        breaks = c(1950, 1960, 1980, 2000, 2020), 
        limits = c(1950, 2020)) +
 
-  
   labs(x = "Number of Zeros",
        y = "LPI", fill = "Years\n") +
+
   theme_minimal() +
     theme(
       panel.border = element_rect(
@@ -174,19 +193,18 @@ scale_fill_viridis_c(option = "D",
       linewidth = 2    
     ),
     text = element_text(size = 20, family = "bold"),
-    plot.title = element_text(size = 14, face = "bold")
+    plot.title = element_text(size = 14, face = "bold") 
   )
 
 Fig3
 
-ggsave(filename=paste0("05Plots/Fig3.png"), Fig3, dpi = 300) ## plot used in the paper
-
+ggsave(filename=paste0("05Plots/Fig3.png"), Fig3,  width = 35, height = 20, units = "cm", dpi = 300) ## plot used in the paper
 
 ##### Supp Mat
 ## SuppMat 1a
 lpi_resultR <- read.csv('04FinalData/complete/real/Complete_dataSet/Complete_dataSet.csv')
 
-SuppMat1a <- ggplot(lpi_resultR, aes(x = years)) +
+SuppMat1 <- ggplot(lpi_resultR, aes(x = years)) +
   coord_cartesian(ylim = c(0, 1.3)) +
   geom_ribbon(aes(ymin = CI_low, ymax = CI_high), alpha = 0.3, fill = "#ff7f0e") +
   geom_line(aes(y = LPI_final), color = "#ff7f0e", size = 1.5) +
@@ -207,7 +225,7 @@ SuppMat1a <- ggplot(lpi_resultR, aes(x = years)) +
     axis.title.y.right = element_text(color = "#9467bd")
   )
 
-ggsave(filename=paste0("05Plots/SuppMat1a.jpeg"), SuppMat1a, dpi = 300) ## plot used in the paper
+ggsave(filename=paste0("05Plots/SuppMat1.jpeg"), SuppMat1, width = 35, height = 20, units = "cm", dpi = 300) ## plot used in the paper
 
 ## SuppMat 1b
 ## Zeros on the permutations
@@ -255,8 +273,8 @@ fnumzero <- map_df(valid_indices, ~ {
   mutate(resultsPermu0[[.x]], sim = .x, label = "Permutations")
 })
 
-SuppMat1b <- ggplot()+
-  coord_cartesian(ylim = c(0, 1.3)) +
+SuppMat2 <- ggplot()+
+ coord_cartesian(ylim = c(0.5, 1.3)) +
 
   geom_point(data = fnumzero, aes(x = numZeros, y = LPI_final), 
              color = "#1f77b4", alpha = 1, size = 1) +
@@ -275,12 +293,8 @@ SuppMat1b <- ggplot()+
     text = element_text(size = 20, family = "bold"),
     plot.title = element_text(size = 14, face = "bold")
   )
-SuppMat1b
+SuppMat2
 
 
-ggsave(filename=paste0("05Plots/SuppMat1b.jpeg"), SuppMat1b, dpi = 300) 
+ggsave(filename=paste0("05Plots/SuppMat2.jpeg"), SuppMat2, width = 35, height = 20, units = "cm", dpi = 300) 
 
-Suppmat1b <- SuppMat1a + SuppMat1b  &
-  plot_annotation(tag_levels = "A") 
-
-ggsave(filename=paste0("05Plots/Other/SuppMat1b.jpeg"),Suppmat1b, dpi = 300) 
