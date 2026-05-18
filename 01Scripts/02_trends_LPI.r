@@ -85,18 +85,22 @@ labels <- c("concave", "linear", "convex")
 to_plot<- out <- bind_rows(
   lapply(seq_along(high_results), function(i) {
     df <- as.data.frame(high_results[[i]])
-    df$years <- 1950:2021
+    df <- lpi_result[-nrow(lpi_result), ] # removing the “2021” value that is just a duplicate placeholder
+    df$years <- 1950:2020
     df$label <- labels[i]
     df$sim <- 1
     df
   })
 )
 
+to_plot <- to_plot[to_plot$years != 2021, ]# removing the “2021” value that is just a duplicate placeholder
 dir.create("04FinalData/complete/simulated/Conv_conc_lin/",
            recursive = TRUE,
            showWarnings = FALSE)
 
+
 write.csv(to_plot, '04FinalData/complete/simulated/Conv_conc_lin/Conv_conc_lin.csv')
+#to_plot <- read.csv('04FinalData/complete/simulated/Conv_conc_lin/Conv_conc_lin.csv')
 
 #####################################################################################################################
 ## Loop to computes the LPI with linear, concave and convex removing 0, 20%, 40%, 60% y 80% percent of the dataset
@@ -224,12 +228,15 @@ MeanRemresu_Join <- Remresu_Join %>%
 write.csv(MeanRemresu_Join, '04FinalData/complete/simulated/Conv_conc_lin_Remdt/RemovingData_resultsMedian.csv')
 
 Concave_miss_data  <-MeanRemresu_Join %>% filter(trend_type == "Concave Decrease")
+Concave_miss_data <- Concave_miss_data[Concave_miss_data$years != 2021, ]# removing the “2021” value that is just a duplicate placeholder
 write.csv(Concave_miss_data, '04FinalData/complete/simulated/Conv_conc_lin_Remdt/Conv_gapsMed.csv')
 
 linear_miss_data <- MeanRemresu_Join %>% filter(trend_type == "Linear Decrease" )
+linear_miss_data <- linear_miss_data[linear_miss_data$years != 2021, ]# removing the “2021” value that is just a duplicate placeholder
 write.csv(linear_miss_data, '04FinalData/complete/simulated/Conv_conc_lin_Remdt/linear_gapsMed.csv')
 
 convex_miss_data <- MeanRemresu_Join %>% filter(trend_type == "Convex Decrease")
+convex_miss_data <- convex_miss_data[convex_miss_data$years != 2021, ]# removing the “2021” value that is just a duplicate placeholder
 write.csv(convex_miss_data, '04FinalData/complete/simulated/Conv_conc_lin_Remdt/convex_gapsMed.csv')
 
 #Concave_miss_data <- read.csv('04FinalData/complete/simulated/Conv_conc_lin_Remdt/Conv_gapsMed.csv')

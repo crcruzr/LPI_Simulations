@@ -88,8 +88,7 @@ lpi_result <- LPIMain(
   title = 'LPI Results Simulated Data - Full Dataset', REF_YEAR = 1950, PLOT_MAX = 2020, BOOT_STRAP_SIZE = 1000, VERBOSE = FALSE
 )
 
-lpi_result$years <- c(years, 2021)
-
+lpi_result <- lpi_result[-nrow(lpi_result), ] #removing the “2021” value that is just a duplicate placeholder
 dir.create("04FinalData/complete/simulated/Complete_dataSet",
            recursive = TRUE,
            showWarnings = FALSE)
@@ -116,7 +115,6 @@ lpi_resultR <- LPIMain(
   title = 'LPI Results Real Data', REF_YEAR = 1950, PLOT_MAX = 2020, BOOT_STRAP_SIZE = 1000, VERBOSE = FALSE
 )
 
-lpi_resultR$years <- c(years, 2021)
 lpi_data_filtered <- lpi_data %>% select(matches("^X[0-9]"))
 lpi_data_filtered <- clean_data(lpi_data_filtered)
 TotofZeros <- colSums(lpi_data_filtered == 0, na.rm = T)

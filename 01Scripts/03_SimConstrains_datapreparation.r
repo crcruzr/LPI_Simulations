@@ -84,7 +84,7 @@ TotofZeros <- colSums(lpi_data_filtered == 0, na.rm = T) # Count the number of z
 lpi_resultNAZero$numZeros <- TotofZeros # Add, per year, the number of zeros 
 
 write.csv(lpi_resultNAZero, '04FinalData/constrain/1_na_zero_permutations/without_permutation/without_permutationNAand0.csv')
-#lpi_resultNAZero <- read.csv('04FinalData/constrain/without/without_permutationNAand0.csv')
+#lpi_resultNAZero <- read.csv('04FinalData/constrain/1_na_zero_permutations/without_permutation/without_permutationNAand0.csv')
 
 ########################
 # 2. NAs permutations ##
@@ -109,7 +109,7 @@ dir.create("04FinalData/constrain/2_na_permutations/without_permutation/",
 
 lpi_resultNA$years <- years
 write.csv(lpi_resultNA, '04FinalData/constrain/2_na_permutations/without_permutation/without_permutationNA.csv')
-#lpi_resultNA <- read.csv('04FinalData/constrain/without_permutation/without_permutationNA.csv')
+#lpi_resultNA <- read.csv('04FinalData/constrain/2_na_permutations/without_permutation/without_permutationNA.csv')
 
 ###########################
 ## 3. Zeros permutations ##

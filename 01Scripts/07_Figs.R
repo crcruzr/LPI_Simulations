@@ -110,10 +110,12 @@ resultsPermu0 <- lapply(1:nf1, function(i) {
 # Convert each data frame in the list to a data.table and add years column
 for (i in seq_along(resultsPermu0)) {
   setDT(resultsPermu0[[i]])  # convert in-place, no warning if already data.table
-  resultsPermu0[[i]][, years := c(years,2021)]
+  resultsPermu0[[i]] <- resultsPermu0[[i]][-nrow(resultsPermu0[[i]]), ]
+  resultsPermu0[[i]][, years := years]
 }
-
 head(resultsPermu0[[1]],3)
+tail(resultsPermu0[[1]],3)
+
 
 f2e <- purrr::map_df(seq_along(resultsPermu0), ~ mutate(resultsPermu0[[.x]], sim = .x, label = "Permutations using \n empirical-data zeros"))
 f2e <- lpi_multiplot(f2e, colr = colr); f2e
@@ -165,8 +167,6 @@ filter_labels <- function(df) {
 lpi_labels <- lpi_resultR %>%
   filter(years %in% c(1955, 1974, 1991, 1997, 2009, 2010, 2013, 2017, 2020))
 
-
-
 Fig3 <-
  ggplot(data = lpi_resultR, aes(x = numZeros, y = LPI_final, label = years, shape = "Simulations")) +
   geom_hline(yintercept = 1,  color = "orange", size = 1) +#ff7300
@@ -199,7 +199,6 @@ scale_fill_viridis_c(option = "D",
 Fig3
 
 ggsave(filename=paste0("05Plots/Fig3.png"), Fig3,  width = 35, height = 20, units = "cm", dpi = 300) ## plot used in the paper
-
 ##### Supp Mat
 ## SuppMat 1a
 lpi_resultR <- read.csv('04FinalData/complete/real/Complete_dataSet/Complete_dataSet.csv')
@@ -244,9 +243,8 @@ matricesPermu0 <- lapply(1:npd, function(i) {
 matricesPermu0_up <- lapply(matricesPermu0, function(df) {
   df[ , !(names(df) %in% c('Binomial', 'ID'))]
 })
-
 ## Check the number of zeros on the results
-head(matricesPermu0[[1]],3)
+head(matricesPermu0[[1]],1)
 
 # Adding zeros per permutation inthemaatriz of the results
 for (i in seq_along(resultsPermu0)) {
@@ -256,7 +254,7 @@ for (i in seq_along(resultsPermu0)) {
     if (i <= length(matricesPermu0_up) && !is.null(matricesPermu0_up[[i]])) {
       df_matrix <- matricesPermu0_up[[i]] ## upload the original dataset
       setDT(resultsPermu0[[i]]) # upload the seults
-      resultsPermu0[[i]] <- resultsPermu0[[i]][c(1:nrow(resultsPermu0[[i]]) -1), ]
+      #resultsPermu0[[i]] <- resultsPermu0[[i]][c(1:nrow(resultsPermu0[[i]]) -1), ]
       ## Ad columns
       resultsPermu0[[i]][, years := c(years)] # years
       numZeros <- colSums(df_matrix == 0, na.rm = TRUE) 
@@ -294,7 +292,6 @@ SuppMat2 <- ggplot()+
     plot.title = element_text(size = 14, face = "bold")
   )
 SuppMat2
-
 
 ggsave(filename=paste0("05Plots/SuppMat2.jpeg"), SuppMat2, width = 35, height = 20, units = "cm", dpi = 300) 
 
