@@ -74,7 +74,7 @@ f1 <- (plot_spacer() | f1a| plot_spacer()) /
     color = guide_legend(override.aes = list(size = 4))
   )
 f1
-ggsave(filename=paste0("05Plots/Fig1.jpeg"), f1, dpi = 300) ## plot used in the paper
+ggsave(filename=paste0("05Plots/Fig1.jpeg"), f1,  width = 17, height = 20, units = "cm", dpi = 300) ## plot used in the paper
 
 
 ##Fig 2
@@ -150,7 +150,7 @@ f2 <- (f2a | f2b) /
 
 f2
 
-ggsave(filename=paste0("05Plots/Fig2.jpeg"), f2, dpi = 300) ## plot used in the paper
+ggsave(filename=paste0("05Plots/Fig2.jpeg"), f2, width = 15, height = 20, units = "cm", dpi = 300) ## plot used in the paper
 
 ### Fig 3
 lpi_resultNAZero <- read.csv('04FinalData/constrain/1_na_zero_permutations/without_permutation/without_permutationNAand0.csv')
