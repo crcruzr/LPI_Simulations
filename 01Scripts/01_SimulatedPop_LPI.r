@@ -92,7 +92,11 @@ lpi_result <- lpi_result[-nrow(lpi_result), ] #removing the “2021” value tha
 dir.create("04FinalData/complete/simulated/Complete_dataSet",
            recursive = TRUE,
            showWarnings = FALSE)
-           
+
+names(lpi_result)
+# assume your data frame is called df and X is the column you want to rename
+names(lpi_result) <- ifelse(names(lpi_result) == "X", "years", names(lpi_result))
+
 write.csv(lpi_result, '04FinalData/complete/simulated/Complete_dataSet/Complete_dataSet.csv')
 #lpi_result <- read.csv('04FinalData/complete/simulated/Complete_dataSet/Complete_dataSet.csv')
 
@@ -125,8 +129,11 @@ dir.create("04FinalData/complete/real/Complete_dataSet",
            recursive = TRUE,
            showWarnings = FALSE)
 
+# assume your data frame is called df and X is the column you want to rename
+names(lpi_resultR) <- ifelse(names(lpi_resultR) == "X", "years", names(lpi_resultR))
+
 write.csv(lpi_resultR, '04FinalData/complete/real/Complete_dataSet/Complete_dataSet.csv')
-#lpi_resultR <- read.csv('04FinalData/complete/real/Complete_dataSet/Complete_dataSet.csv')
+lpi_resultR <- read.csv('04FinalData/complete/real/Complete_dataSet/Complete_dataSet.csv')
 
 ###########
 ### END ###
