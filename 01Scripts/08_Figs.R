@@ -78,7 +78,6 @@ ggsave(filename=paste0("05Plots/Fig1.jpeg"), f1,  width = 17, height = 20, units
 
 
 ##Fig 2
-
 lpi_resultR <- read.csv('04FinalData/complete/real/Complete_dataSet/Complete_dataSet.csv')
 f2a <- plot_lpi_table(lpi_resultR, colr = colr2, show_label = FALSE);f2a
 ggsave(filename=paste0("05Plots/Fig2a.jpeg"), f2a, dpi = 300) ## plot used in the paper
@@ -97,9 +96,9 @@ ggsave(filename=paste0("05Plots/Fig2d.jpeg"), f2d, dpi = 300) ## plot used in th
 
 #Merge all of the iteractions
 
-nf1 <-length(list.files('03processedData/constrain/3_zero_permutations/simulatedData/results/', full.names = TRUE))
+nf1 <-length(list.files('04FinalData/constrain/3_zero_permutations/simulatedData/results/', full.names = TRUE))
 resultsPermu0 <- lapply(1:nf1, function(i) {
-  filepath <- sprintf("03processedData/constrain/3_zero_permutations/simulatedData/results/permutation_result_%03d.rds", i)
+  filepath <- sprintf("04FinalData/constrain/3_zero_permutations/simulatedData/results/permutation_result_%03d.rds", i)
   if (file.exists(filepath)) {
     readRDS(filepath)
   } else {
@@ -195,7 +194,6 @@ scale_fill_viridis_c(option = "D",
     text = element_text(size = 20, family = "bold"),
     plot.title = element_text(size = 14, face = "bold") 
   )
-
 Fig3
 
 ggsave(filename=paste0("05Plots/Fig3.png"), Fig3,  width = 35, height = 20, units = "cm", dpi = 300) ## plot used in the paper
@@ -227,50 +225,7 @@ SuppMat1 <- ggplot(lpi_resultR, aes(x = years)) +
 ggsave(filename=paste0("05Plots/SuppMat1.jpeg"), SuppMat1, width = 35, height = 20, units = "cm", dpi = 300) ## plot used in the paper
 
 ## SuppMat 1b
-## Zeros on the permutations
-# simulated data used to creates the matrices
-npd <-length(list.files('03processedData/constrain/3_zero_permutations/simulatedData/processing/',  pattern = 'matrix', full.names = TRUE))
-
-matricesPermu0 <- lapply(1:npd, function(i) {
-  filepath <- sprintf("03processedData/constrain/3_zero_permutations/simulatedData/processing/matrix_%03d.rds", i)
-  if (file.exists(filepath)) {
-    readRDS(filepath)
-  } else {
-    NULL  
-  }
-}) 
-# Create a matrix with the matrices used to obtain the LPI
-matricesPermu0_up <- lapply(matricesPermu0, function(df) {
-  df[ , !(names(df) %in% c('Binomial', 'ID'))]
-})
-## Check the number of zeros on the results
-head(matricesPermu0[[1]],1)
-
-# Adding zeros per permutation inthemaatriz of the results
-for (i in seq_along(resultsPermu0)) {
-  # Check if the data frame exists and is not NULL
-  if (!is.null(resultsPermu0[[i]]) && nrow(resultsPermu0[[i]]) > 0) {
-    # Check if corresponding matrix exists in the other list
-    if (i <= length(matricesPermu0_up) && !is.null(matricesPermu0_up[[i]])) {
-      df_matrix <- matricesPermu0_up[[i]] ## upload the original dataset
-      setDT(resultsPermu0[[i]]) # upload the seults
-      #resultsPermu0[[i]] <- resultsPermu0[[i]][c(1:nrow(resultsPermu0[[i]]) -1), ]
-      ## Ad columns
-      resultsPermu0[[i]][, years := c(years)] # years
-      numZeros <- colSums(df_matrix == 0, na.rm = TRUE) 
-      resultsPermu0[[i]] [, numZeros := numZeros] # number of zeros
-    }
-  }
-}
-
-head(resultsPermu0[[2]],3)
-# Keep only non-NULL data frames
-valid_indices <- which(!sapply(resultsPermu0, is.null) & sapply(resultsPermu0, is.data.frame))
-
-fnumzero <- map_df(valid_indices, ~ {
-  mutate(resultsPermu0[[.x]], sim = .x, label = "Permutations")
-})
-
+fnumzero <- read.csv('04FinalData/constrain/3_zero_permutations/simulatedData/Number_of_Zeros_zerpermut.csv')
 SuppMat2 <- ggplot()+
  coord_cartesian(ylim = c(0.5, 1.3)) +
 

@@ -85,19 +85,16 @@ labels <- c("concave", "linear", "convex")
 to_plot<- out <- bind_rows(
   lapply(seq_along(high_results), function(i) {
     df <- as.data.frame(high_results[[i]])
-    df <- lpi_result[-nrow(lpi_result), ] # removing the “2021” value that is just a duplicate placeholder
-    df$years <- 1950:2020
+    df <- df[-nrow(df), ] # removing the “2021” value that is just a duplicate placeholder
+    df$years <- years
     df$label <- labels[i]
     df$sim <- 1
     df
   })
 )
-
-to_plot <- to_plot[to_plot$years != 2021, ]# removing the “2021” value that is just a duplicate placeholder
 dir.create("04FinalData/complete/simulated/Conv_conc_lin/",
            recursive = TRUE,
            showWarnings = FALSE)
-
 
 write.csv(to_plot, '04FinalData/complete/simulated/Conv_conc_lin/Conv_conc_lin.csv')
 #to_plot <- read.csv('04FinalData/complete/simulated/Conv_conc_lin/Conv_conc_lin.csv')

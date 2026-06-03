@@ -17,7 +17,8 @@ base_paths <- c(
 
 sub_paths <- c(
   "without_permutation",
-  "simulatedData/processing"
+  "simulatedData/processing",
+  "simulatedData/results"
 )
 
 # Create all directories
