@@ -3,10 +3,10 @@
 01Scripts/Other*
 02Documents/*
 03processedData/*
-04FinalData/*
 05Plots/Other*
 lpi_temp/
 Rplots.pdf
+
 
 #Server
 jobs/*
