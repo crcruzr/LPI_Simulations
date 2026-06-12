@@ -62,7 +62,7 @@ plot(as.numeric(species_data_clean[sample(1:nrow(species_data_clean),1),]))
 #To process it you should download the LPD data from the LPI website https://www.livingplanetindex.org/data_portal and save it in the folder 00RawData.
 # The file name should be adjusted if it is different
 lpi_data <- read.csv('00RawData/LPD_2024_public.csv') #include in this folder the LPD data
-lpi_data = dplyr::filter(lpi_data, Replicate == 0) # Remove replicates
+lpi_data = filter(lpi_data, Replicate == 0) # Remove replicates
 
 years <- as.numeric(gsub("X", "",(names(lpi_data)[grepl(paste0("^", "X", "[0-9]+$"),  names(lpi_data))]))) ## Modified to add the same number of years in the LPI
 S <- nrow(lpi_data) ## Modified to add the same number of rows in the LPI
@@ -89,6 +89,8 @@ lpi_result <- LPIMain(
 )
 
 lpi_result <- lpi_result[-nrow(lpi_result), ] #removing the “2021” value that is just a duplicate placeholder
+lpi_result$years <- years
+
 dir.create("04FinalData/complete/simulated/Complete_dataSet",
            recursive = TRUE,
            showWarnings = FALSE)
@@ -98,7 +100,7 @@ names(lpi_result)
 names(lpi_result) <- ifelse(names(lpi_result) == "X", "years", names(lpi_result))
 
 write.csv(lpi_result, '04FinalData/complete/simulated/Complete_dataSet/Complete_dataSet.csv')
-#lpi_result <- read.csv('04FinalData/complete/simulated/Complete_dataSet/Complete_dataSet.csv')
+lpi_result <- read.csv('04FinalData/complete/simulated/Complete_dataSet/Complete_dataSet.csv')
 
 # Read and process real LPI data
 ###################################
@@ -123,6 +125,7 @@ lpi_data_filtered <- lpi_data %>% select(matches("^X[0-9]"))
 lpi_data_filtered <- clean_data(lpi_data_filtered)
 TotofZeros <- colSums(lpi_data_filtered == 0, na.rm = T)
 lpi_resultR <- lpi_resultR[-nrow(lpi_resultR),]
+lpi_resultR$years <- years
 lpi_resultR$numZeros <- TotofZeros
 
 dir.create("04FinalData/complete/real/Complete_dataSet",

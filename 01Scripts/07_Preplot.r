@@ -1,10 +1,10 @@
 library(data.table)
-library(mutate)
-library(map_df)
+library(purrr)
+library(tidyverse)
 
 ####### Move files to the final folder
 ################## 
-
+years <- seq(1950,2020,1)
 # Copy the NA permutations with the final result to the Final Data folder
 file.copy("03processedData/constrain/2_na_permutations/simulatedData/results/", 
           "04FinalData/constrain/2_na_permutations/simulatedData/",
@@ -38,7 +38,28 @@ matricesPermu0_up <- lapply(matricesPermu0, function(df) {
 # Check the number of zeros on the results
 head(matricesPermu0[[1]],1)
 
-# Adding zeros per permutation inthemaatriz of the results
+nf1 <-length(list.files('04FinalData/constrain/3_zero_permutations/simulatedData/results/', full.names = TRUE))
+
+resultsPermu0 <- lapply(1:nf1, function(i) {
+  filepath <- sprintf("04FinalData/constrain/3_zero_permutations/simulatedData/results/permutation_result_%03d.rds", i)
+  if (file.exists(filepath)) {
+    readRDS(filepath)
+  } else {
+    NULL  # or NA, or any placeholder for missing files
+  }
+})
+
+# Convert each data frame in the list to a data.table and add years column
+for (i in seq_along(resultsPermu0)) {
+  setDT(resultsPermu0[[i]])  # convert in-place, no warning if already data.table
+  resultsPermu0[[i]] <- resultsPermu0[[i]][-nrow(resultsPermu0[[i]]), ] #removing the “2021” value that is just a duplicate placeholder
+
+  resultsPermu0[[i]][, years := c(years)]
+}
+
+head(resultsPermu0[[1]],3)
+
+# Adding zeros per permutation in the maatriz of the results
 for (i in seq_along(resultsPermu0)) {
   # Check if the data frame exists and is not NULL
   if (!is.null(resultsPermu0[[i]]) && nrow(resultsPermu0[[i]]) > 0) {
@@ -59,7 +80,7 @@ head(resultsPermu0[[2]],3)
 # Keep only non-NULL data frames
 valid_indices <- which(!sapply(resultsPermu0, is.null) & sapply(resultsPermu0, is.data.frame))
 
-fnumzero <- map_df(valid_indices, ~ {
+fnumzero <- map_dfr(valid_indices, ~ {
   mutate(resultsPermu0[[.x]], sim = .x, label = "Permutations")
 })
 
