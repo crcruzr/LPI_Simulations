@@ -1,26 +1,22 @@
 # =============================================================================
 # Large-scale simulation workflow
 #
-# This script was developed for execution on Compute Canada / Alliance HPC
+# This script was developed for execution on Calcul Québec (calculquebec.ca)  
+# and the Digital Research Alliance of Canada (alliancecan.ca) 
 # resources using the SLURM scheduler.
 #
 # The simulation workload is computationally intensive and may require
 # substantial CPU time and memory. 
 #
-# This script can be run in two modes:
-# 1) HPC (for example Alliance / Compute Canada)
+# Nevertheless, this script can detect if you are runnign the code locally.
+# 
+# If you are working in HPC (for  Calcul Québec (calculquebec.ca))
 #    - Run via SLURM job array
 #    - Iteration is provided as an argument:
 #        Rscript script.R $SLURM_ARRAY_TASK_ID
 #
-# 2) Local execution 
-#    - Run manually in a loop or with parallel processing
-#    - Example:
-#        for i in 1:30; do Rscript script.R $i; done
-#    - Or with GNU parallel:
-#        seq 1 30 | parallel -j 16 Rscript script.R {}
-#
-# Required resources (local execution):
+# If you are working at local execution, select the number of iteractions, you want to run
+#   Required resources (local execution):
 #    - ≥16 CPU cores recommended
 #    - ≥64 GB RAM recommended for full workflow
 # =============================================================================
@@ -32,20 +28,53 @@ library(data.table)
 #functions 
 source('01Scripts/Functions.r')
 
-## Run 300 Permutations
-args = commandArgs(trailingOnly=TRUE)
-iteration_number <- as.numeric(args[1])
+## Unified local + HPC execution
 
-print(paste("Simulation starts at", Sys.time()))
+args <- commandArgs(trailingOnly = TRUE)
 
-# Process to do the iterations
-process_permutation(
-  iteration_number, 
-  base_path = "03processedData/constrain/3_zero_permutations/simulatedData",
-  title_prefix = "LPI Results Simulated Data - Real Dataset - Only NA and zero - permutation"
-)
-print(paste("Iteration", iteration_number, "finished at", Sys.time()))
-print('Permutations with the zeros finnished')
+# Detect execution mode
+is_hpc <- length(args) > 0
+
+if (is_hpc) {
+
+  # HPC mode: one iteration per job
+  iteration_number <- as.numeric(args[1])
+
+  message("[MODE] HPC")
+  print(paste("Simulation starts at", Sys.time()))
+
+  process_permutation(
+    w = iteration_number,
+    base_path = "03processedData/constrain/3_zero_permutations/simulatedData",
+    title_prefix = "LPI Results Simulated Data - Real Dataset - Only zero permutation"
+  )
+
+  print(paste("Iteration", iteration_number, "finished at", Sys.time()))
+  print("Permutations with the zeros finished")
+
+} else {
+
+  # Local mode: run all permutations sequentially
+  iteration_number <- seq(1, 2)
+
+  message("[MODE] LOCAL")
+  warning("This code is running only ", length(iteration_number), " iteractons. Change it if you want to run more")
+
+  for (v in iteration_number) {
+
+    print(paste("Simulation starts at", Sys.time()))
+
+    process_permutation(
+      w = v,
+      base_path = "03processedData/constrain/3_zero_permutations/simulatedData",
+      title_prefix = "LPI Results Simulated Data - Real Dataset - Only zero permutation"
+    )
+
+    print(paste("Iteration", v, "finished at", Sys.time()))
+  }
+
+  print("Permutations with the zeros finnished")
+}
 
 ##############
 #### END #####
