@@ -74,7 +74,7 @@ f1 <- (plot_spacer() | f1a| plot_spacer()) /
     color = guide_legend(override.aes = list(size = 4))
   )
 f1
-ggsave(filename=paste0("05Plots/Fig1.jpeg"), f1,  width = 17, height = 20, units = "cm", dpi = 300) ## plot used in the paper
+ggsave(filename=paste0("05Plots/Fig11.jpeg"), f1,  width = 17, height = 20, units = "cm", dpi = 300) ## plot used in the paper
 
 
 ##Fig 2
