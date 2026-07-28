@@ -177,7 +177,7 @@ Fig3 <-
  # geom_point(data = lpi_resultR, aes( fill = years, shape = "LPD"), alpha = 0.7, size = 5, colour="black",pch=22) +
 
 scale_fill_viridis_c(option = "D",
-       guide = guide_colorbar(nbin = 8, raster = FALSE, barheight = unit(5, "cm"), ticks = FALSE, show.limits = FALSE),
+       guide = guide_colorbar(nbin = 8, raster = FALSE, barheight = unit(5, "cm"), ticks = FALSE),
        breaks = c(1950, 1960, 1980, 2000, 2020), 
        limits = c(1950, 2020)) +
 

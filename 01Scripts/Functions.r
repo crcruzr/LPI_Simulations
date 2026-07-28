@@ -300,7 +300,7 @@ process_permutation <- function(w = 1, base_path = getwd(),
       index_vector = TRUE,
       name = file.path(input_path, as.character(w)),
       start_col_name = "X1950",
-      end_col_name = "X2019",
+      end_col_name = "X2020",
       CUT_OFF_YEAR = 1950
     ),
     title = paste(title_prefix, w),

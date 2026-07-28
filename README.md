@@ -85,6 +85,12 @@ All analyses can be reproduced by running the scripts in the `01Scripts` directo
 
 Intermediate outputs are stored in `03processedData`, final datasets are written to `04FinalData`, and figures are saved in `05Plots`.
 
+>[!Warning]
+ >These simulations use the rlpi package. To install the exact same version we used (SHA 2631ae8), run as follows: 
+ >```R
+> pak::pak("github::Zoological-Society-of-London/rlpi@2631ae8")
+> ```
+
 ## Computational Requirements
 
 Scripts 4–6 were developed for execution on [Alliance (Compute Canada)](https://www.alliancecan.ca/en) high-performance computing resources. These simulations are computationally demanding and may not be practical on standard personal computers.
